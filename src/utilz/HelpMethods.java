@@ -10,8 +10,10 @@ public class HelpMethods {
 		if(!IsSolid(x, y, lvlData))
 			if(!IsSolid(x + width, y + height, lvlData))
 				if(!IsSolid(x + width, y, lvlData))
-					if(!IsSolid(x, y + height, lvlData))
-						return true;
+					if(!IsSolid(x + width, y + (height / 2), lvlData))
+						if(!IsSolid(x, y + height, lvlData))
+							if(!IsSolid(x, y + (height / 2), lvlData))
+								return true;
 		return false;
 	}
 	
@@ -47,7 +49,7 @@ public class HelpMethods {
 		if(airSpeed > 0) {
 			// Falling or touching floor
 			int tileYPos = currentTile * Game.TILES_SIZE;
-			int yOffset = (int)(Game.TILES_SIZE - hitbox.height);
+			int yOffset = (int)(Game.TILES_SIZE - hitbox.height + (32 * Game.SCALE));
 			return tileYPos + yOffset - 1;
 		}else
 			// Jumping

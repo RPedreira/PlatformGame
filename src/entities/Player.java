@@ -13,7 +13,7 @@ public class Player extends Entity{
 	private int playerAction = IDLE;
 	private boolean moving = false, attacking = false;
 	private boolean left, up, right, down, jump;
-	private float playerSpeed = 2.0f;
+	private float playerSpeed = 1.0f * Game.SCALE;
 	private int[][] lvlData;
 	private float xDrawOffset = 45 * Game.SCALE;
 	private float yDrawOffset = 42 * Game.SCALE;
@@ -26,7 +26,7 @@ public class Player extends Entity{
 	public Player(float x, float y, int width, int height) {
 		super(x, y, width, height);
 		loadAnimations();
-		initHitbox(x + xDrawOffset, y + yDrawOffset, 19 * Game.SCALE, 37 * Game.SCALE);
+		initHitbox(x + xDrawOffset, y + yDrawOffset, (int)(19 * Game.SCALE), (int)(37 * Game.SCALE));
 	}
 	
 	public void update() {
@@ -135,7 +135,7 @@ public class Player extends Entity{
 
 	private void loadAnimations() {
 		BufferedImage img = LoadSave.GetSpriteAtlas(LoadSave.PLAYER_ATLAS);
-		animations = new BufferedImage[8][10];
+		animations = new BufferedImage[7][10];
 		for(int i = 0; i < animations.length; i++)
 			for(int j = 0; j < animations[i].length; j++)
 				animations[i][j] = img.getSubimage(j*120, i*80, 120, 80);
