@@ -1,8 +1,15 @@
 package utilz;
 
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Float;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import entities.Goblin;
 import main.Game;
+import utilz.Constants.EnemyConstants;
 
 public class HelpMethods {
 	
@@ -26,8 +33,11 @@ public class HelpMethods {
 		
 		float xIndex = x / Game.TILES_SIZE;
 		float yIndex = y / Game.TILES_SIZE;
-		int value = lvlData[(int)yIndex][(int)xIndex];
-		
+		return IsTileSolid((int)xIndex, (int)yIndex, lvlData);
+	}
+	
+	public static boolean IsTileSolid(int xTile, int yTile, int[][] lvlData) {
+		int value = lvlData[yTile][xTile];
 		if((value < 72 && value != 10 && value != 11) || value > 79)
 			return true;
 		return false;
@@ -63,5 +73,67 @@ public class HelpMethods {
 			if(!IsSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData))
 				return false;
 		return true;
+	}
+	
+	public static boolean IsFloor(Rectangle2D.Float hitbox, float xSpeed, int[][] lvlData) {
+		if(xSpeed > 0)
+			return IsSolid(hitbox.x + hitbox.width, hitbox.y + hitbox.height + 1, lvlData);
+		else
+			return IsSolid(hitbox.x + xSpeed, hitbox.y + hitbox.height + 1, lvlData);
+	}
+	
+	public static boolean IsAllTilesWalkable(int xStart, int xEnd, int y, int[][] lvlData) {
+		for(int i = xStart; i < xEnd - xStart; i++) {
+			if(IsTileSolid(i, y, lvlData))
+				return false;
+			if(!IsTileSolid(i, y + 1, lvlData))
+				return false;
+		}
+		return true;
+	}
+	
+	public static boolean IsSightClear(int[][] lvlData, Rectangle2D.Float firstHitbox, Rectangle2D.Float secondHitbox, int yTile) {
+		int firstXTile = (int)(firstHitbox.x / Game.TILES_SIZE);
+		int secondXTile = (int)(secondHitbox.x / Game.TILES_SIZE);
+		if(firstXTile > secondXTile)
+			return IsAllTilesWalkable(secondXTile, firstXTile, yTile, lvlData);
+		else
+			return IsAllTilesWalkable(firstXTile, secondXTile, yTile, lvlData);
+	}
+	
+	public static int[][] GetLevelData(BufferedImage img){
+		int[][] levelData = new int[img.getHeight()][img.getWidth()];
+		for(int i = 0; i < img.getHeight(); i++)
+			for(int j = 0; j < img.getWidth(); j++) {
+				Color color = new Color(img.getRGB(j, i));
+				int value = color.getRed();
+				if(value > 64 || value == 63)
+					value = 72;
+				levelData[i][j] = value; 
+			}
+		return levelData;
+	}
+	
+	public static ArrayList<Goblin> GetGoblins(BufferedImage img){
+		ArrayList<Goblin> list = new ArrayList<>();
+		for(int i = 0; i < img.getHeight(); i++)
+			for(int j = 0; j < img.getWidth(); j++) {
+				Color color = new Color(img.getRGB(j, i));
+				int value = color.getGreen();
+				if(value == EnemyConstants.GOBLIN)
+					list.add(new Goblin((j - 2) * Game.TILES_SIZE, (i - 3) * Game.TILES_SIZE));
+			}
+		return list;
+	}
+	
+	public static Point GetPlayerSpawn(BufferedImage img) {
+		for(int i = 0; i < img.getHeight(); i++)
+			for(int j = 0; j < img.getWidth(); j++) {
+				Color color = new Color(img.getRGB(j, i));
+				int value = color.getGreen();
+				if(value == 200)
+					return new Point(j * Game.TILES_SIZE, i * Game.TILES_SIZE);
+			}
+		return new Point(Game.TILES_SIZE, Game.TILES_SIZE);
 	}
 }
